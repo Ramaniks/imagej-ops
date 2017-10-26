@@ -6,13 +6,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -78,6 +78,38 @@ public class ColocNamespace extends AbstractNamespace {
 	@OpMethod(op = net.imagej.ops.coloc.kendallTau.KendallTauBRank.class)
 	public <T extends RealType<T>, U extends RealType<U>> Double kendallTau(final Iterable<T> image1, final Iterable<U> image2) {
 		final Double result = (Double) ops().run(net.imagej.ops.coloc.kendallTau.KendallTauBRank.class, image1, image2);
+		return result;
+	}
+
+	// -- maxTKendallTau --
+
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
+		final Iterable<T> in1, final Iterable<U> in2)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
+		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2,
+			threshold1);
+		return result;
+	}
+
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
+		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1,
+		final RealType<U> threshold2)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2,
+			threshold1, threshold2);
 		return result;
 	}
 
