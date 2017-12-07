@@ -94,6 +94,7 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>>
 			values1[i] = values[i][0];
 			values2[i] = values[i][1];
 		}
+
 		// use explicitly defined thresholds if provided, otherwise compute them
 		final double thresh1 = threshold1 == null ? //
 			threshold(image1) : threshold1.getRealDouble();
@@ -126,7 +127,7 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>>
 		return values;
 	}
 
-	double[][] rankTransformation(final double[][] values, final double thres1,
+	static double[][] rankTransformation(final double[][] values, final double thres1,
 		final double thres2, final int n)
 	{
 		final double[][] tempRank = new double[n][2];
