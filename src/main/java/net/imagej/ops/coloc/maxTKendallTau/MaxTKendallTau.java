@@ -107,13 +107,13 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return maxtau;
 	}
 
-	private <V extends RealType<V>> double threshold(final Iterable<V> image) {
+	<V extends RealType<V>> double threshold(final Iterable<V> image) {
 		// call Otsu if explicit threshold was not given
 		final Histogram1d<V> histogram = ops().image().histogram(image);
 		return ops().threshold().otsu(histogram).getRealDouble();
 	}
 
-	protected double[][] dataPreprocessing(
+	double[][] dataPreprocessing(
 		final Iterable<Pair<T, U>> iterablePair, final int capacity)
 	{
 		final double[][] values = new double[capacity][2];
@@ -126,7 +126,7 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return values;
 	}
 
-	private double[][] rankTransformation(final double[][] values,
+	double[][] rankTransformation(final double[][] values,
 		final double thres1, final double thres2, final int n)
 	{
 		final double[][] tempRank = new double[n][2];
@@ -225,7 +225,7 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return finalrank;
 	}
 
-	private double calculateMaxKendallTau(final double[][] rank,
+	double calculateMaxKendallTau(final double[][] rank,
 		final double thresholdRank1, final double thresholdRank2, final int n)
 	{
 		final int rn = rank.length;
@@ -267,7 +267,7 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return maxNormalTau;
 	}
 
-	private double calculateKendallTau(final double[][] rank,
+	double calculateKendallTau(final double[][] rank,
 		final List<Integer> activeIndex)
 	{
 		final int an = activeIndex.size();
