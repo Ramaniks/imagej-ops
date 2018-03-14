@@ -60,8 +60,8 @@ import org.scijava.plugin.Plugin;
  * @param <U> Type of the second image
  */
 @Plugin(type = Ops.Coloc.MaxTKendallTau.class)
-public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extends
-	AbstractBinaryFunctionOp<Iterable<T>, Iterable<U>, Double> implements
+public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>>
+	extends AbstractBinaryFunctionOp<Iterable<T>, Iterable<U>, Double> implements
 	Ops.Coloc.MaxTKendallTau, Contingent
 {
 
@@ -113,8 +113,8 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return ops().threshold().otsu(histogram).getRealDouble();
 	}
 
-	double[][] dataPreprocessing(
-		final Iterable<Pair<T, U>> iterablePair, final int capacity)
+	double[][] dataPreprocessing(final Iterable<Pair<T, U>> iterablePair,
+		final int capacity)
 	{
 		final double[][] values = new double[capacity][2];
 		int count = 0;
@@ -126,8 +126,8 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 		return values;
 	}
 
-	double[][] rankTransformation(final double[][] values,
-		final double thres1, final double thres2, final int n)
+	double[][] rankTransformation(final double[][] values, final double thres1,
+		final double thres2, final int n)
 	{
 		final double[][] tempRank = new double[n][2];
 		for (int i = 0; i < n; i++) {
@@ -286,25 +286,9 @@ public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>> extend
 			index[i] = i;
 		}
 
-		IntArraySorter.sort(index, new IntComparator() {
+		IntArraySorter.sort(index, (a, b) -> Double.compare(partRank1[a], partRank1[b]));
 
-			@Override
-			public int compare(final int a, final int b) {
-				final double xa = partRank1[a];
-				final double xb = partRank1[b];
-				return Double.compare(xa, xb);
-			}
-		});
-
-		final MergeSort mergeSort = new MergeSort(index, new IntComparator() {
-
-			@Override
-			public int compare(final int a, final int b) {
-				final double ya = partRank2[a];
-				final double yb = partRank2[b];
-				return Double.compare(ya, yb);
-			}
-		});
+		final MergeSort mergeSort = new MergeSort(index, (a, b) -> Double.compare(partRank2[a], partRank2[b]));
 
 		final long n0 = an * (long) (an - 1) / 2;
 		final long S = mergeSort.sort();

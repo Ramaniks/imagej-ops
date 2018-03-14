@@ -1,38 +1,40 @@
+
 package net.imagej.ops.coloc;
 
 /**
- * Helper class for MaxKendallTau op.
+ * Helper class for MaxKendallTau op. 
  *
+ * @author Shulei Wang
  * @author Ellen Arena
  */
 public class MergeSort {
 
-	private int[] index;
+	private int[] data;
 	private final IntComparator comparator;
 
-	public MergeSort(int[] index, IntComparator comparator) {
-		this.index = index;
+	public MergeSort(int[] data, IntComparator comparator) {
+		this.data = data;
 		this.comparator = comparator;
 	}
 
-	public int[] getSorted() {
-		return index;
+	public int[] getSortedData() {
+		return data;
 	}
 
 	/**
-	 * Sorts the {@link #index} array.
+	 * Sorts the {@link #data} array.
 	 * <p>
 	 * This implements a non-recursive merge sort.
 	 * </p>
-	 * @param begin
-	 * @param end
+	 * 
 	 * @return the equivalent number of BubbleSort swaps
 	 */
 	public long sort() {
 		long swaps = 0;
-		int n = index.length;
-		// There are merge sorts which perform in-place, but their runtime is worse than O(n log n)
-		int[] index2 = new int[n];
+		int n = data.length;
+		// There are merge sorts which perform in-place, but their runtime is worse
+		// than O(n log n)
+		int[] data2 = new int[n];
 		for (int step = 1; step < n; step <<= 1) {
 			int begin = 0, k = 0;
 			for (;;) {
@@ -48,31 +50,35 @@ public class MergeSort {
 				// and perform merge, too
 				int i = begin, j = begin2;
 				while (i < begin2 && j < end) {
-					int compare = comparator.compare(index[i], index[j]);
+					int compare = comparator.compare(data[i], data[j]);
 					if (compare > 0) {
 						swaps += (begin2 - i);
-						index2[k++] = index[j++];
-					} else {
-						index2[k++] = index[i++];
+						data2[k++] = data[j++];
+					}
+					else {
+						data2[k++] = data[i++];
 					}
 				}
 				if (i < begin2) {
+
 					do {
-						index2[k++] = index[i++];
-					} while (i < begin2);
-				} else {
+						data2[k++] = data[i++];
+					}
+					while (i < begin2);
+				}
+				else {
 					while (j < end) {
-						index2[k++] = index[j++];
+						data2[k++] = data[j++];
 					}
 				}
 				begin = end;
 			}
 			if (k < n) {
-				System.arraycopy(index, k, index2, k, n - k);
+				System.arraycopy(data, k, data2, k, n - k);
 			}
-			int[] swapIndex = index2;
-			index2 = index;
-			index = swapIndex;
+			int[] swapIndex = data2;
+			data2 = data;
+			data = swapIndex;
 		}
 
 		return swaps;
