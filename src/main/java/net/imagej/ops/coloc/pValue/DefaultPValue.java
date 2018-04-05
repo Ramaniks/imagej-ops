@@ -60,10 +60,10 @@ public class DefaultPValue<T extends RealType<T>, U extends RealType<U>> extends
 	private BinaryFunctionOp<Iterable<T>, Iterable<U>, Double> op;
 
 	@Parameter(required = false)
-	private int nrRandomizations = 1000;
+	private Dimensions psfSize;
 
 	@Parameter(required = false)
-	private Dimensions psfSize;
+	private int nrRandomizations = 1000;
 
 	@Parameter(required = false)
 	private long seed = 0x27372034;
