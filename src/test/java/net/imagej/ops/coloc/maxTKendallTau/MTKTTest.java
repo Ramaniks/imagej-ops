@@ -30,6 +30,8 @@
 
 package net.imagej.ops.coloc.maxTKendallTau;
 
+import static org.junit.Assert.assertEquals;
+
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.type.numeric.RealType;
 
@@ -55,23 +57,35 @@ public class MTKTTest<V extends RealType<V>> extends AbstractOpTest {
 		double[] values2 = {2.1, 1.2, 3.3, 4.6};
 		for (int i = 0; i < 4; i++) {
 			values[i][0] = values1[i];
-			System.out.println("values1 = " + values1[i] + " ");
 			values[i][1] = values2[i];
-			System.out.println("values2 = " + values2[i] + " ");
 		}
 		double[][] rank = MTKT.rankTransformation(values, 0.0, 0.0, 4);
-//		double[] valuesRank1 = new double[4];
-//		double[] valuesRank2 = new double[4];
+		double[] valuesRank1 = {2.0, 1.0, 3.0, 4.0};
 		for (int i = 0; i < 4; i++) {
-//			valuesRank1[i] = rank[i][0];
-			System.out.println("valuesRank1 = " + rank[i][0] + " ");
-			System.out.println("valuesRank2 = " + rank[i][1] + " ");
-//			valuesRank2[i] = rank[i][1];
+			assertEquals(rank[i][0], valuesRank1[i], 0.0);
+			assertEquals(rank[i][1], valuesRank1[i], 0.0);
 		}
 	}
 	@Test
 	public void testRankTransformationTie() {
-
+		double[][] values = new double[4][2];
+		double[] values1 = {2.1, 3.0, 3.0, 4.2};
+		double[] values2 = {2.1, 3.0, 3.0, 4.2};
+		for (int i = 0; i < 4; i++) {
+			values[i][0] = values1[i];
+			values[i][1] = values2[i];
+			System.out.println("Value1: " + values[i][0]);
+			System.out.println("Value2: " + values[i][1]);
+		}
+		double[][] rank = MTKT.rankTransformation(values, 0.0, 0.0, 4);
+		double[] valuesRank1 = {1.0, 2.0, 3.0, 4.0};
+		double[] valuesRank2 = {1.0, 3.0, 2.0, 4.0};
+		for (int i = 0; i < 4; i++) {
+//	  assertEquals(rank[i][0], (valuesRank1[i] || valuesRank2[i]), 0.0);
+//		assertEquals(rank[i][1], (valuesRank1[i] || valuesRank2[i]), 0.0);
+			System.out.println("Rank1: " + rank[i][0]);
+			System.out.println("Rank2: " + rank[i][1]);
+		}
 	}
 	// kendall tau, we need to test the function calculateKendallTau, we can use
 	// some case like (1 2 3 4 and 4 3 2 1) tau=-1 or (1 2 3 4 and 1 2 3 4) tau=1

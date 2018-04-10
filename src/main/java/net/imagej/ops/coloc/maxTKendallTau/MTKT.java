@@ -133,100 +133,168 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	static double[][] rankTransformation(final double[][] values, final double thres1,
 		final double thres2, final int n)
 	{
+		
+/////////////////////////////////////////////////////////////////////////////////////////// Shulei's original version <<below>>
+//		final double[][] tempRank = new double[n][2];
+//		for (int i = 0; i < n; i++) {
+//			tempRank[i][0] = values[i][0];
+//			tempRank[i][1] = values[i][1];
+//		}
+//
+//		Arrays.sort(tempRank, new Comparator<double[]>() {
+//
+//			@Override
+//			public int compare(final double[] row1, final double[] row2) {
+//				return Double.compare(row1[1], row2[1]);
+//			}
+//		});
+//
+//		int start = 0;
+//		int end = 0;
+//		int rank = 0;
+//		while (end < n - 1) {
+//			while (Double.compare(tempRank[start][1], tempRank[end][1]) == 0) {
+//				end++;
+//				if (end >= n) break;
+//			}
+//			for (int i = start; i < end; i++) {
+//				tempRank[i][1] = rank + Math.random();
+//			}
+//			rank++;
+//			start = end;
+//		}
+//
+//		Arrays.sort(tempRank, new Comparator<double[]>() {
+//
+//			@Override
+//			public int compare(final double[] row1, final double[] row2) {
+//				return Double.compare(row1[1], row2[1]);
+//			}
+//		});
+//
+//		for (int i = 0; i < n; i++) {
+//			tempRank[i][1] = i + 1;
+//		}
+//
+//		// second
+//		Arrays.sort(tempRank, new Comparator<double[]>() {
+//
+//			@Override
+//			public int compare(final double[] row1, final double[] row2) {
+//				return Double.compare(row1[0], row2[0]);
+//			}
+//		});
+//
+//		start = 0;
+//		end = 0;
+//		rank = 0;
+//		while (end < n - 1) {
+//			while (Double.compare(tempRank[start][0], tempRank[end][0]) == 0) {
+//				end++;
+//				if (end >= n) break;
+//			}
+//			for (int i = start; i < end; i++) {
+//				tempRank[i][0] = rank + Math.random();
+//			}
+//			rank++;
+//			start = end;
+//		}
+//
+//		Arrays.sort(tempRank, new Comparator<double[]>() {
+//
+//			@Override
+//			public int compare(final double[] row1, final double[] row2) {
+//				return Double.compare(row1[0], row2[0]);
+//			}
+//		});
+//
+//		for (int i = 0; i < n; i++) {
+//			tempRank[i][0] = i + 1;
+//		}
+//
+//		final List<Integer> validIndex = new ArrayList<Integer>();
+//		for (int i = 0; i < n; i++) {
+//			if (tempRank[i][0] >= thres1 && tempRank[i][1] >= thres2) {
+//				validIndex.add(i);
+//			}
+//		}
+//
+//		final int rn = validIndex.size();
+//		final double[][] finalrank = new double[rn][2];
+//		int index = 0;
+//		for (final Integer i : validIndex) {
+//			finalrank[index][0] = tempRank[i][0];
+//			finalrank[index][1] = tempRank[i][1];
+//			index++;
+//		}
+//
+//		return finalrank;
+/////////////////////////////////////////////////////////////////////////////////////////// Shulei's original version <<above>>		
+		
 		final double[][] tempRank = new double[n][2];
 		for (int i = 0; i < n; i++) {
 			tempRank[i][0] = values[i][0];
 			tempRank[i][1] = values[i][1];
 		}
-
+		
+		// FIRST...
 		Arrays.sort(tempRank, new Comparator<double[]>() {
-
-			@Override
-			public int compare(final double[] row1, final double[] row2) {
-				return Double.compare(row1[1], row2[1]);
-			}
-		});
-
-		int start = 0;
-		int end = 0;
-		int rank = 0;
-		while (end < n - 1) {
-			while (Double.compare(tempRank[start][1], tempRank[end][1]) == 0) {
-				end++;
-				if (end >= n) break;
-			}
-			for (int i = start; i < end; i++) {
-				tempRank[i][1] = rank + Math.random();
-			}
-			rank++;
-			start = end;
-		}
-
-		Arrays.sort(tempRank, new Comparator<double[]>() {
-
-			@Override
-			public int compare(final double[] row1, final double[] row2) {
-				return Double.compare(row1[1], row2[1]);
-			}
-		});
-
-		for (int i = 0; i < n; i++) {
-			tempRank[i][1] = i + 1;
-		}
-
-		// second
-		Arrays.sort(tempRank, new Comparator<double[]>() {
-
 			@Override
 			public int compare(final double[] row1, final double[] row2) {
 				return Double.compare(row1[0], row2[0]);
 			}
 		});
-
-		start = 0;
-		end = 0;
-		rank = 0;
-		while (end < n - 1) {
-			while (Double.compare(tempRank[start][0], tempRank[end][0]) == 0) {
-				end++;
-				if (end >= n) break;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (tempRank[i][0] == values[j][0]) {
+					tempRank[i][0] = j + Math.random();
+				}
 			}
-			for (int i = start; i < end; i++) {
-				tempRank[i][0] = rank + Math.random();
-			}
-			rank++;
-			start = end;
 		}
-
+		final double[][] ranks = new double[n][2];
+		for (int i = 0; i < n; i++) {
+			ranks[i][0] = tempRank[i][0] + 1;
+		}
+		
+		// SECOND...
 		Arrays.sort(tempRank, new Comparator<double[]>() {
-
 			@Override
 			public int compare(final double[] row1, final double[] row2) {
-				return Double.compare(row1[0], row2[0]);
+				return Double.compare(row1[1], row2[1]);
 			}
 		});
-
 		for (int i = 0; i < n; i++) {
-			tempRank[i][0] = i + 1;
+			for (int j = 0; j < n; j++) {
+				if (tempRank[i][1] == values[j][1]) {
+					tempRank[i][1] = j + Math.random();
+				}
+			}
 		}
-
-		final List<Integer> validIndex = new ArrayList<Integer>();
 		for (int i = 0; i < n; i++) {
-			if (tempRank[i][0] >= thres1 && tempRank[i][1] >= thres2) {
+			ranks[i][1] = tempRank[i][1] + 1;
+		}
+		
+		// TODO: breaking ties
+		
+		//////////////////////////////// TODO: Confirm dealing with thresholds (same as Shulei's method) <<below>>
+		List<Integer> validIndex = new ArrayList<Integer>();
+		for (int i = 0; i < n; i++)
+		{
+			if(ranks[i][0] >= thres1 && ranks[i][1] >= thres2)
+			{
 				validIndex.add(i);
 			}
 		}
-
-		final int rn = validIndex.size();
-		final double[][] finalrank = new double[rn][2];
+		int rn=validIndex.size();
+		double[][] finalRanks = new double[rn][2];
 		int index = 0;
-		for (final Integer i : validIndex) {
-			finalrank[index][0] = tempRank[i][0];
-			finalrank[index][1] = tempRank[i][1];
+		for( Integer i : validIndex ) {
+			finalRanks[index][0] = Math.floor(ranks[i][0]);
+			finalRanks[index][1] = Math.floor(ranks[i][1]);
 			index++;
 		}
-
-		return finalrank;
+		////////////////////////////////Dealing with thresholds (same as Shulei's method) <<above>>
+		return finalRanks;
 	}
 
 	double calculateMaxKendallTau(final double[][] rank,
