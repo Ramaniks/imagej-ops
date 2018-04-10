@@ -58,6 +58,9 @@ import org.scijava.plugin.Plugin;
  *
  * @param <T> Type of the first image
  * @param <U> Type of the second image
+ * 
+ * @author Shulei Wang
+ * @author Ellen T Arena
  */
 @Plugin(type = Ops.Coloc.MaxTKendallTau.class)
 public class MTKT<T extends RealType<T>, U extends RealType<U>>

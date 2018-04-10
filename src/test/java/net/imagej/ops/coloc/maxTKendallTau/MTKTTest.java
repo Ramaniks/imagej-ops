@@ -39,6 +39,7 @@ import org.junit.Test;
  * Tests {@link net.imagej.ops.Ops.Coloc.MaxTKendallTau}.
  *
  * @author Ellen T Arena
+ * @author Shulei Wang
  * @param <V>
  */
 public class MTKTTest<V extends RealType<V>> extends AbstractOpTest {
