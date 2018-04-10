@@ -83,32 +83,32 @@ public class ColocNamespace extends AbstractNamespace {
 
 	// -- maxTKendallTau --
 
-	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
 	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
 		final Iterable<T> in1, final Iterable<U> in2)
 	{
 		final Double result = (Double) ops().run(
-			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2);
+			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
 	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
 		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1)
 	{
 		final Double result = (Double) ops().run(
-			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2,
+			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2,
 			threshold1);
 		return result;
 	}
 
-	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class)
+	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
 	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
 		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1,
 		final RealType<U> threshold2)
 	{
 		final Double result = (Double) ops().run(
-			net.imagej.ops.coloc.maxTKendallTau.MaxTKendallTau.class, in1, in2,
+			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2,
 			threshold1, threshold2);
 		return result;
 	}

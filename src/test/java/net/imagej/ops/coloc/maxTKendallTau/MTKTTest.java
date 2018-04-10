@@ -41,7 +41,7 @@ import org.junit.Test;
  * @author Ellen T Arena
  * @param <V>
  */
-public class MaxTKendallTauTest<V extends RealType<V>> extends AbstractOpTest {
+public class MTKTTest<V extends RealType<V>> extends AbstractOpTest {
 	
 	// Ranking data, test the rankTransformation() function. There are
 	// two cases: 1) no tie breaking, test if this function
@@ -58,7 +58,7 @@ public class MaxTKendallTauTest<V extends RealType<V>> extends AbstractOpTest {
 			values[i][1] = values2[i];
 			System.out.println("values2 = " + values2[i] + " ");
 		}
-		double[][] rank = MaxTKendallTau.rankTransformation(values, 0.0, 0.0, 4);
+		double[][] rank = MTKT.rankTransformation(values, 0.0, 0.0, 4);
 //		double[] valuesRank1 = new double[4];
 //		double[] valuesRank2 = new double[4];
 		for (int i = 0; i < 4; i++) {

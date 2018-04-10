@@ -60,7 +60,7 @@ import org.scijava.plugin.Plugin;
  * @param <U> Type of the second image
  */
 @Plugin(type = Ops.Coloc.MaxTKendallTau.class)
-public class MaxTKendallTau<T extends RealType<T>, U extends RealType<U>>
+public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	extends AbstractBinaryFunctionOp<Iterable<T>, Iterable<U>, Double> implements
 	Ops.Coloc.MaxTKendallTau, Contingent
 {
