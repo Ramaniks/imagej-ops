@@ -37,10 +37,8 @@ import java.util.List;
 
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
-import net.imagej.ops.Ops.Coloc.KendallTau;
 import net.imagej.ops.coloc.ColocUtil;
 import net.imagej.ops.coloc.IntArraySorter;
-import net.imagej.ops.coloc.IntComparator;
 import net.imagej.ops.coloc.MergeSort;
 import net.imagej.ops.special.function.AbstractBinaryFunctionOp;
 import net.imglib2.histogram.Histogram1d;
@@ -48,13 +46,11 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.IterablePair;
 import net.imglib2.util.Pair;
 
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  * This algorithm calculates Maximum Trunctated Kendall Tau (MTKT) from Wang et
- * al. (2017), use explicitly defined thresholds if provided, otherwise compute
- * them using Otsu method.
+ * al. (2017); computes thresholds using Otsu method.
  *
  * @param <T> Type of the first image
  * @param <U> Type of the second image
@@ -67,13 +63,6 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	extends AbstractBinaryFunctionOp<Iterable<T>, Iterable<U>, Double> implements
 	Ops.Coloc.MaxTKendallTau, Contingent
 {
-
-	@Parameter(required = false)
-	private T threshold1;
-
-	@Parameter(required = false)
-	private U threshold2;
-
 	@Override
 	public Double calculate(final Iterable<T> image1, final Iterable<U> image2) {
 
@@ -98,11 +87,9 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 			values2[i] = values[i][1];
 		}
 
-		// use explicitly defined thresholds if provided, otherwise compute them
-		final double thresh1 = threshold1 == null ? //
-			threshold(image1) : threshold1.getRealDouble();
-		final double thresh2 = threshold2 == null ? //
-			threshold(image2) : threshold2.getRealDouble();
+		// compute thresholds
+		final double thresh1 = threshold(image1);
+		final double thresh2 = threshold(image2);
 
 		rank = rankTransformation(values, thresh1, thresh2, capacity);
 
