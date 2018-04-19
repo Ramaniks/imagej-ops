@@ -32,6 +32,7 @@ package net.imagej.ops.coloc.maxTKendallTau;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,12 +42,20 @@ import net.imagej.ops.coloc.ColocUtil;
 import net.imagej.ops.coloc.IntArraySorter;
 import net.imagej.ops.coloc.MergeSort;
 import net.imagej.ops.special.function.AbstractBinaryFunctionOp;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.histogram.Histogram1d;
+import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.IntervalIndexer;
+import net.imglib2.util.Intervals;
 import net.imglib2.util.IterablePair;
 import net.imglib2.util.Pair;
+import net.imglib2.util.Util;
+import net.imglib2.view.Views;
 
 import org.scijava.plugin.Plugin;
+import org.scijava.util.IntArray;
 
 /**
  * This algorithm calculates Maximum Trunctated Kendall Tau (MTKT) from Wang et
@@ -60,64 +69,40 @@ import org.scijava.plugin.Plugin;
  */
 @Plugin(type = Ops.Coloc.MaxTKendallTau.class)
 public class MTKT<T extends RealType<T>, U extends RealType<U>>
-	extends AbstractBinaryFunctionOp<Iterable<T>, Iterable<U>, Double> implements
+	extends AbstractBinaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double> implements
 	Ops.Coloc.MaxTKendallTau, Contingent
 {
 	@Override
-	public Double calculate(final Iterable<T> image1, final Iterable<U> image2) {
-
-		final Iterable<Pair<T, U>> samples = new IterablePair<>(image1, image2);
-
-		double[][] values;
-		double[][] rank;
-		double maxtau;
-
-		int capacity = 0;
-		for (@SuppressWarnings("unused")
-		final Pair<T, U> sample : samples) {
-			capacity++;
+	public Double calculate(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2) {
+		// check image sizes
+		// TODO: Add these checks to conforms().
+		if (Intervals.equalDimensions(image1, image2)) {
+			throw new IllegalArgumentException("Image dimensions do not match");
 		}
-
-		values = dataPreprocessing(samples, capacity);
-
-		final double[] values1 = new double[capacity];
-		final double[] values2 = new double[capacity];
-		for (int i = 0; i < capacity; i++) {
-			values1[i] = values[i][0];
-			values2[i] = values[i][1];
+		final long n1 = Intervals.numElements(image1);
+		if (n1 > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException("Image dimensions too large: " + n1);
 		}
+		final int n = (int) n1;
 
 		// compute thresholds
 		final double thresh1 = threshold(image1);
 		final double thresh2 = threshold(image2);
 
-		rank = rankTransformation(values, thresh1, thresh2, capacity);
+		double[][] rank = rankTransformation(image1, image2, thresh1, thresh2, n);
 
-		maxtau = calculateMaxKendallTau(rank, thresh1, thresh2, capacity);
+		double maxtau = calculateMaxKendallTau(rank, thresh1, thresh2, n);
 
 		return maxtau;
 	}
 
-	<V extends RealType<V>> double threshold(final Iterable<V> image) {
+	<V extends RealType<V>> double threshold(final RandomAccessibleInterval<V> image) {
 		// call Otsu if explicit threshold was not given
-		final Histogram1d<V> histogram = ops().image().histogram(image);
+		final Histogram1d<V> histogram = ops().image().histogram(Views.iterable(image));
 		return ops().threshold().otsu(histogram).getRealDouble();
 	}
 
-	double[][] dataPreprocessing(final Iterable<Pair<T, U>> iterablePair,
-		final int capacity)
-	{
-		final double[][] values = new double[capacity][2];
-		int count = 0;
-		for (final Pair<T, U> sample : iterablePair) {
-			values[count][0] = sample.getA().getRealDouble();
-			values[count][1] = sample.getB().getRealDouble();
-			count++;
-		}
-		return values;
-	}
-
-	static double[][] rankTransformation(final double[][] values, final double thres1,
+	static <T extends RealType<T>, U extends RealType<U>> double[][] rankTransformation(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2, final double thres1,
 		final double thres2, final int n)
 	{
 		
@@ -218,56 +203,15 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 //		return finalrank;
 /////////////////////////////////////////////////////////////////////////////////////////// Shulei's original version <<above>>		
 		
-		final double[][] tempRank = new double[n][2];
-		for (int i = 0; i < n; i++) {
-			tempRank[i][0] = values[i][0];
-			tempRank[i][1] = values[i][1];
-		}
-		
 		// FIRST...
-		Arrays.sort(tempRank, new Comparator<double[]>() {
-			@Override
-			public int compare(final double[] row1, final double[] row2) {
-				return Double.compare(row1[0], row2[0]);
-			}
-		});
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				if (tempRank[i][0] == values[j][0]) {
-					tempRank[i][0] = j + Math.random();
-				}
-			}
-		}
-		final double[][] ranks = new double[n][2];
-		for (int i = 0; i < n; i++) {
-			ranks[i][0] = tempRank[i][0] + 1;
-		}
-		
-		// SECOND...
-		Arrays.sort(tempRank, new Comparator<double[]>() {
-			@Override
-			public int compare(final double[] row1, final double[] row2) {
-				return Double.compare(row1[1], row2[1]);
-			}
-		});
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				if (tempRank[i][1] == values[j][1]) {
-					tempRank[i][1] = j + Math.random();
-				}
-			}
-		}
-		for (int i = 0; i < n; i++) {
-			ranks[i][1] = tempRank[i][1] + 1;
-		}
-		
-		// TODO: breaking ties
-		
+		final IntArray rankIndex1 = rankSamples(image1);
+		final IntArray rankIndex2 = rankSamples(image2);
+
 		//////////////////////////////// TODO: Confirm dealing with thresholds (same as Shulei's method) <<below>>
 		List<Integer> validIndex = new ArrayList<Integer>();
 		for (int i = 0; i < n; i++)
 		{
-			if(ranks[i][0] >= thres1 && ranks[i][1] >= thres2)
+			if(rankIndex1.get(i) >= thres1 && rankIndex2.get(i) >= thres2)
 			{
 				validIndex.add(i);
 			}
@@ -276,15 +220,48 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		double[][] finalRanks = new double[rn][2];
 		int index = 0;
 		for( Integer i : validIndex ) {
-			finalRanks[index][0] = Math.floor(ranks[i][0]);
-			finalRanks[index][1] = Math.floor(ranks[i][1]);
+			finalRanks[index][0] = Math.floor(rankIndex1.get(i));
+			finalRanks[index][1] = Math.floor(rankIndex2.get(i));
 			index++;
 		}
 		////////////////////////////////Dealing with thresholds (same as Shulei's method) <<above>>
 		return finalRanks;
 	}
 
-	double calculateMaxKendallTau(final double[][] rank,
+	private static <V extends RealType<V>> IntArray rankSamples(RandomAccessibleInterval<V> image) {
+		final long elementCount = Intervals.numElements(image);
+		if (elementCount > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException("Image dimensions too large: " + elementCount);
+		}
+		final int n = (int) elementCount;
+
+		// NB: Initialize rank index in random order, to ensure random tie-breaking.
+		final IntArray rankIndex = new IntArray(n);		
+		for (int i = 0; i < n; i++) {
+			rankIndex.setValue(i, i);
+		}
+		Collections.shuffle(rankIndex);
+
+		final V a = Util.getTypeFromInterval(image).createVariable();
+		final RandomAccess<V> ra = image.randomAccess();
+		Collections.sort(rankIndex, new Comparator<Integer>() {
+			@Override
+			public int compare(final Integer indexA, final Integer indexB) {
+				IntervalIndexer.indexToPosition(indexA, image, ra);
+				a.set(ra.get());
+				IntervalIndexer.indexToPosition(indexB, image, ra);
+				final V b = ra.get();
+				return a.compareTo(b);
+			}
+		});
+
+		return rankIndex;
+		// TODO: Consider returning Img<UnsignedIntType> or Img<UnsignedLongType>.
+		// We could do this now by wrapping rankIndex via ArrayImgs.unsignedInts(rankIndex.getArray(), dims).
+		// But better to use UnsignedLongType indices, or even Img<D> where D is N-dimensional coord type?
+	}
+
+	static double calculateMaxKendallTau(final double[][] rank,
 		final double thresholdRank1, final double thresholdRank2, final int n)
 	{
 		final int rn = rank.length;
@@ -326,7 +303,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		return maxNormalTau;
 	}
 
-	double calculateKendallTau(final double[][] rank,
+	static double calculateKendallTau(final double[][] rank,
 		final List<Integer> activeIndex)
 	{
 		final int an = activeIndex.size();
@@ -358,6 +335,6 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 
 	@Override
 	public boolean conforms() {
-		return ColocUtil.sameIterationOrder(in1(), in2());
+		return true;
 	}
 }
