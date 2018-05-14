@@ -33,7 +33,10 @@ package net.imagej.ops.coloc.maxTKendallTau;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops.AbstractOpTest;
+import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
 
@@ -59,11 +62,13 @@ public class MTKTTest<V extends RealType<V>> extends AbstractOpTest {
 			values[i][0] = values1[i];
 			values[i][1] = values2[i];
 		}
-		double[][] rank = MTKT.rankTransformation(values, 0.0, 0.0, 4);
-		double[] valuesRank1 = {2.0, 1.0, 3.0, 4.0};
+		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
+		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
+		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4);
+		double[] expectedRankOrder = {1, 0, 2, 3};
 		for (int i = 0; i < 4; i++) {
-			assertEquals(rank[i][0], valuesRank1[i], 0.0);
-			assertEquals(rank[i][1], valuesRank1[i], 0.0);
+			assertEquals(expectedRankOrder[i], rank[i][0], 0.0);
+			assertEquals(expectedRankOrder[i], rank[i][1], 0.0);
 		}
 	}
 	@Test
@@ -74,24 +79,59 @@ public class MTKTTest<V extends RealType<V>> extends AbstractOpTest {
 		for (int i = 0; i < 4; i++) {
 			values[i][0] = values1[i];
 			values[i][1] = values2[i];
-			System.out.println("Value1: " + values[i][0]);
-			System.out.println("Value2: " + values[i][1]);
 		}
-		double[][] rank = MTKT.rankTransformation(values, 0.0, 0.0, 4);
-		double[] valuesRank1 = {1.0, 2.0, 3.0, 4.0};
-		double[] valuesRank2 = {1.0, 3.0, 2.0, 4.0};
+		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
+		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
+		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4);
+		double[] expectedRankOrder1 = {0, 1, 2, 3};
+		double[] expectedRankOrder2 = {0, 2, 1, 3};
 		for (int i = 0; i < 4; i++) {
-//	  assertEquals(rank[i][0], (valuesRank1[i] || valuesRank2[i]), 0.0);
-//		assertEquals(rank[i][1], (valuesRank1[i] || valuesRank2[i]), 0.0);
-			System.out.println("Rank1: " + rank[i][0]);
-			System.out.println("Rank2: " + rank[i][1]);
+			// first element
+			assertEquals(expectedRankOrder1[0], rank[0][0], 0.0); 
+			assertEquals(expectedRankOrder1[0], rank[0][1], 0.0);
+			// second element
+			if (rank[1][0] == 1.0) {
+				assertEquals(expectedRankOrder1[1], rank[1][0], 0.0);
+			} else if (rank[1][0] == 2.0) {
+				assertEquals(expectedRankOrder2[1], rank[1][0], 0.0);
+			}
+			if (rank[1][1] == 1.0) {
+				assertEquals(expectedRankOrder1[1], rank[1][1], 0.0);
+			} else if (rank[1][1] == 2.0) {
+				assertEquals(expectedRankOrder2[1], rank[1][1], 0.0);
+			}
+			// third element
+			if (rank[2][0] == 2.0) {
+				assertEquals(expectedRankOrder1[2], rank[2][0], 0.0);
+			} else if (rank[2][0] == 1.0) {
+				assertEquals(expectedRankOrder2[2], rank[2][0], 0.0);
+			}
+			if (rank[2][1] == 2.0) {
+				assertEquals(expectedRankOrder1[2], rank[2][1], 0.0);
+			} else if (rank[2][1] == 1.0) {
+				assertEquals(expectedRankOrder2[2], rank[2][1], 0.0);
+			}
+			// fourth element
+			assertEquals(expectedRankOrder1[3], rank[3][0], 0.0); 
+			assertEquals(expectedRankOrder1[3], rank[3][1], 0.0);
 		}
 	}
 	// kendall tau, we need to test the function calculateKendallTau, we can use
 	// some case like (1 2 3 4 and 4 3 2 1) tau=-1 or (1 2 3 4 and 1 2 3 4) tau=1
 	@Test
 	public void testCalculateKendallTau() {
-		
+		double[][] values = new double[4][2];
+		double[] values1 = {1, 2, 3, 4};
+		double[] values2 = {4, 3, 2, 1};
+		for (int i = 0; i < 4; i++) {
+			values[i][0] = values1[i];
+			values[i][1] = values2[i];
+		}
+		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
+		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
+		double expectedMTKT = -1;
+		double mtkt = MTKT.calculateKendallTau(values, final List<Integer> activeIndex)
+		//System.out.println(mtkt);
 		
 	}
 
