@@ -53,31 +53,41 @@ public class ColocNamespace extends AbstractNamespace {
 	// -- icq --
 
 	@OpMethod(op = net.imagej.ops.coloc.icq.LiICQ.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double icq(final Iterable<T> image1, final Iterable<T> image2,
-			final DoubleType mean1, final DoubleType mean2) {
-		final Double result = (Double) ops().run(net.imagej.ops.coloc.icq.LiICQ.class, image1, image2, mean1, mean2);
+	public <T extends RealType<T>, U extends RealType<U>> Double icq(
+		final Iterable<T> image1, final Iterable<T> image2, final DoubleType mean1,
+		final DoubleType mean2)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.icq.LiICQ.class, image1, image2, mean1, mean2);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.coloc.icq.LiICQ.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double icq(final Iterable<T> image1, final Iterable<T> image2,
-			final DoubleType mean1) {
-		final Double result = (Double) ops().run(net.imagej.ops.coloc.icq.LiICQ.class, image1, image2, mean1);
+	public <T extends RealType<T>, U extends RealType<U>> Double icq(
+		final Iterable<T> image1, final Iterable<T> image2, final DoubleType mean1)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.icq.LiICQ.class, image1, image2, mean1);
 		return result;
 	}
 
 	@OpMethod(op = net.imagej.ops.coloc.icq.LiICQ.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double icq(final Iterable<T> image1,
-			final Iterable<T> image2) {
-		final Double result = (Double) ops().run(net.imagej.ops.coloc.icq.LiICQ.class, image1, image2);
+	public <T extends RealType<T>, U extends RealType<U>> Double icq(
+		final Iterable<T> image1, final Iterable<T> image2)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.icq.LiICQ.class, image1, image2);
 		return result;
 	}
 
 	// -- kendallTau --
 
 	@OpMethod(op = net.imagej.ops.coloc.kendallTau.KendallTauBRank.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double kendallTau(final Iterable<T> image1, final Iterable<U> image2) {
-		final Double result = (Double) ops().run(net.imagej.ops.coloc.kendallTau.KendallTauBRank.class, image1, image2);
+	public <T extends RealType<T>, U extends RealType<U>> Double kendallTau(
+		final Iterable<T> image1, final Iterable<U> image2)
+	{
+		final Double result = (Double) ops().run(
+			net.imagej.ops.coloc.kendallTau.KendallTauBRank.class, image1, image2);
 		return result;
 	}
 
@@ -85,31 +95,11 @@ public class ColocNamespace extends AbstractNamespace {
 
 	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
 	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
-		final Iterable<T> in1, final Iterable<U> in2)
+		final RandomAccessibleInterval<T> in1,
+		final RandomAccessibleInterval<U> in2)
 	{
 		final Double result = (Double) ops().run(
 			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
-		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1)
-	{
-		final Double result = (Double) ops().run(
-			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2,
-			threshold1);
-		return result;
-	}
-
-	@OpMethod(op = net.imagej.ops.coloc.maxTKendallTau.MTKT.class)
-	public <T extends RealType<T>, U extends RealType<U>> Double maxTKendallTau(
-		final Iterable<T> in1, final Iterable<U> in2, final RealType<T> threshold1,
-		final RealType<U> threshold2)
-	{
-		final Double result = (Double) ops().run(
-			net.imagej.ops.coloc.maxTKendallTau.MTKT.class, in1, in2,
-			threshold1, threshold2);
 		return result;
 	}
 
