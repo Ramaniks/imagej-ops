@@ -76,7 +76,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	public Double calculate(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2) {
 		// check image sizes
 		// TODO: Add these checks to conforms().
-		if (Intervals.equalDimensions(image1, image2)) {
+		if (!(Intervals.equalDimensions(image1, image2))) {
 			throw new IllegalArgumentException("Image dimensions do not match");
 		}
 		final long n1 = Intervals.numElements(image1);
