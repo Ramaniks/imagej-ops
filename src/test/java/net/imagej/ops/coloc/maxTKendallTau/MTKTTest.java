@@ -32,6 +32,8 @@ package net.imagej.ops.coloc.maxTKendallTau;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Random;
+
 import net.imagej.ops.Ops;
 import net.imagej.ops.Ops.Coloc.MaxTKendallTau;
 import net.imagej.ops.coloc.ColocalisationTest;
@@ -74,7 +76,8 @@ public class MTKTTest<T extends RealType<T>, U extends RealType<U>> extends Colo
 		}
 		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
 		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
-		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4);
+		long seed = 0x89302341;
+		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4, seed);
 		double[] expectedRankOrder = {1, 0, 2, 3};
 		for (int i = 0; i < 4; i++) {
 			assertEquals(expectedRankOrder[i], rank[i][0], 0.0);
@@ -92,7 +95,8 @@ public class MTKTTest<T extends RealType<T>, U extends RealType<U>> extends Colo
 		}
 		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
 		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
-		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4);
+		long seed = 0x89302341;
+		double[][] rank = MTKT.rankTransformation(vImage1, vImage2, 0.0, 0.0, 4, seed);
 		double[] expectedRankOrder1 = {0, 1, 2, 3};
 		double[] expectedRankOrder2 = {0, 2, 1, 3};
 		for (int i = 0; i < 4; i++) {
@@ -126,24 +130,6 @@ public class MTKTTest<T extends RealType<T>, U extends RealType<U>> extends Colo
 			assertEquals(expectedRankOrder1[3], rank[3][1], 0.0);
 		}
 	}
-	// kendall tau, we need to test the function calculateKendallTau, we can use
-	// some case like (1 2 3 4 and 4 3 2 1) tau=-1 or (1 2 3 4 and 1 2 3 4) tau=1
-	@Test
-	public void testCalculateKendallTau() {
-		double[][] values = new double[4][2];
-		double[] values1 = {1, 2, 3, 4};
-		double[] values2 = {4, 3, 2, 1};
-		for (int i = 0; i < 4; i++) {
-			values[i][0] = values1[i];
-			values[i][1] = values2[i];
-		}
-		Img<DoubleType> vImage1 = ArrayImgs.doubles(values1, values1.length);
-		Img<DoubleType> vImage2 = ArrayImgs.doubles(values2, values2.length);
-		double expectedMTKT = -1;
-		//double mtkt = MTKT.calculateKendallTau(values, final List<Integer> activeIndex);
-		//System.out.println(mtkt);
-		
-	}
 
 	// then we can test the whole class MTKT together. First, we can test one the
 	// image which is 1 to 10 and 10 to 1. Second, we can generate some random
@@ -152,14 +138,12 @@ public class MTKTTest<T extends RealType<T>, U extends RealType<U>> extends Colo
 	@Test
 	public void testMTKTZeroCorr() {
 		double result = (Double) ops.run(MTKT.class, zeroCorrelationImageCh1, zeroCorrelationImageCh2);
-		assertEquals(2.5, result, 0.5);
-		//System.out.println("zeroCorr mtkt value = " + result);
+		assertEquals(2.7109853865740496, result, 0.0);
 	}
 	@Test
 	public void testMTKTPosCorr() {
 		double result = (Double) ops.run(MTKT.class, positiveCorrelationImageCh1, positiveCorrelationImageCh2);
-		assertEquals(58, result, 1);
-		//System.out.println("posCorr mtkt value = " + result2);
+		assertEquals(57.04572197953461, result, 0.0);
 	}
 
 	// Checks calculated pValue for MTKT.
