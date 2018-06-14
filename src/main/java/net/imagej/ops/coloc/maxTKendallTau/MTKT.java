@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
@@ -54,6 +55,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.util.IntArray;
 
@@ -72,6 +74,9 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	extends AbstractBinaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double> implements
 	Ops.Coloc.MaxTKendallTau, Contingent
 {
+	@Parameter(required=false)
+	private long seed = 0x89302341;
+
 	@Override
 	public Double calculate(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2) {
 		// check image sizes
@@ -89,7 +94,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		final double thresh1 = threshold(image1);
 		final double thresh2 = threshold(image2);
 
-		double[][] rank = rankTransformation(image1, image2, thresh1, thresh2, n);
+		double[][] rank = rankTransformation(image1, image2, thresh1, thresh2, n, seed);
 
 		double maxtau = calculateMaxKendallTau(rank, thresh1, thresh2, n);
 
@@ -103,7 +108,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	}
 
 	static <T extends RealType<T>, U extends RealType<U>> double[][] rankTransformation(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2, final double thres1,
-		final double thres2, final int n)
+		final double thres2, final int n, long seed)
 	{
 		
 /////////////////////////////////////////////////////////////////////////////////////////// Shulei's original version <<below>>
@@ -204,8 +209,8 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 /////////////////////////////////////////////////////////////////////////////////////////// Shulei's original version <<above>>		
 		
 		// FIRST...
-		final IntArray rankIndex1 = rankSamples(image1);
-		final IntArray rankIndex2 = rankSamples(image2);
+		final IntArray rankIndex1 = rankSamples(image1, seed);
+		final IntArray rankIndex2 = rankSamples(image2, seed);
 
 		//////////////////////////////// TODO: Confirm dealing with thresholds (same as Shulei's method) <<below>>
 		List<Integer> validIndex = new ArrayList<Integer>();
@@ -228,7 +233,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		return finalRanks;
 	}
 
-	private static <V extends RealType<V>> IntArray rankSamples(RandomAccessibleInterval<V> image) {
+	private static <V extends RealType<V>> IntArray rankSamples(RandomAccessibleInterval<V> image, long seed) {
 		final long elementCount = Intervals.numElements(image);
 		if (elementCount > Integer.MAX_VALUE) {
 			throw new IllegalArgumentException("Image dimensions too large: " + elementCount);
@@ -240,7 +245,8 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		for (int i = 0; i < n; i++) {
 			rankIndex.setValue(i, i);
 		}
-		Collections.shuffle(rankIndex);
+		Random r = new Random(seed);
+		Collections.shuffle(rankIndex, r);
 
 		final V a = Util.getTypeFromInterval(image).createVariable();
 		final RandomAccess<V> ra = image.randomAccess();
