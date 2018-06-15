@@ -32,14 +32,11 @@ package net.imagej.ops.coloc.maxTKendallTau;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
-
 import net.imagej.ops.Ops;
 import net.imagej.ops.Ops.Coloc.MaxTKendallTau;
 import net.imagej.ops.coloc.ColocalisationTest;
+import net.imagej.ops.coloc.ShuffledView;
 import net.imagej.ops.coloc.pValue.PValueResult;
-import net.imagej.ops.coloc.pearsons.DefaultPearsons;
-import net.imagej.ops.special.function.AbstractBinaryFunctionOp;
 import net.imagej.ops.special.function.BinaryFunctionOp;
 import net.imagej.ops.special.function.Functions;
 import net.imglib2.RandomAccessibleInterval;
@@ -165,16 +162,29 @@ public class MTKTTest<T extends RealType<T>, U extends RealType<U>> extends Colo
 	public void testMTKTpValueZeroCorr() {
 		BinaryFunctionOp<Img<UnsignedByteType>, Img<UnsignedByteType>, Double> op =
 				Functions.binary(ops, MaxTKendallTau.class, Double.class, zeroCorrelationImageCh1, zeroCorrelationImageCh2);
-			PValueResult value = (PValueResult) ops.run(Ops.Coloc.PValue.class, new PValueResult(), zeroCorrelationImageCh1, zeroCorrelationImageCh2, op);
-			System.out.println("zeroCorr p value = " + value.getPValue());
-			//assertEquals(0.274, value.getPValue(), 0.0);
+		final int[] blockSize = new int[zeroCorrelationImageCh1.numDimensions()];
+		for (int d = 0; d < blockSize.length; d++) {
+			final long size = (long) Math.floor(Math.sqrt(zeroCorrelationImageCh1.dimension(d)));
+			blockSize[d] = (int) size;
+		}
+		RandomAccessibleInterval<UnsignedByteType> cropCh1 = ShuffledView.cropAtMin(zeroCorrelationImageCh1, blockSize);
+		RandomAccessibleInterval<UnsignedByteType> cropCh2 = ShuffledView.cropAtMin(zeroCorrelationImageCh2, blockSize);
+		PValueResult value = (PValueResult) ops.run(Ops.Coloc.PValue.class, new PValueResult(), cropCh1, cropCh2, op);
+		assertEquals(0.609, value.getPValue(), 0.0);
 	}
 	@Test
 	public void testMTKTpValuePosCorr() {
-		BinaryFunctionOp<Img<UnsignedByteType>, Img<UnsignedByteType>, Double> op =
-				Functions.binary(ops, MaxTKendallTau.class, Double.class, positiveCorrelationImageCh1, positiveCorrelationImageCh2);
-			PValueResult value = (PValueResult) ops.run(Ops.Coloc.PValue.class, new PValueResult(), positiveCorrelationImageCh1, positiveCorrelationImageCh2, op);
-			System.out.println("posCorr p value = " + value.getPValue());
-			//assertEquals(0.274, value.getPValue(), 0.0);
+//		BinaryFunctionOp<Img<UnsignedByteType>, Img<UnsignedByteType>, Double> op =
+//				Functions.binary(ops, MaxTKendallTau.class, Double.class, positiveCorrelationImageCh1, positiveCorrelationImageCh2);
+//		final int[] blockSize = new int[positiveCorrelationImageCh1.numDimensions()];
+//		for (int d = 0; d < blockSize.length; d++) {
+//			final long size = (long) Math.floor(Math.sqrt(positiveCorrelationImageCh1.dimension(d)));
+//			blockSize[d] = (int) size;
+//		}
+//		RandomAccessibleInterval<UnsignedByteType> cropCh1 = ShuffledView.cropAtMin(positiveCorrelationImageCh1, blockSize);
+//		RandomAccessibleInterval<UnsignedByteType> cropCh2 = ShuffledView.cropAtMin(positiveCorrelationImageCh2, blockSize);
+//		PValueResult value = (PValueResult) ops.run(Ops.Coloc.PValue.class, new PValueResult(), cropCh1, cropCh2, op);
+//		System.out.println("posCorr p value = " + value.getPValue());
+////			//assertEquals(0.274, value.getPValue(), 0.0);
 	}
 }
