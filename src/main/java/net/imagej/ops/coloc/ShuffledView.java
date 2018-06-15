@@ -6,13 +6,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,22 +34,24 @@ import java.util.List;
 import java.util.Random;
 
 import net.imglib2.AbstractInterval;
+import net.imglib2.FinalInterval;
 import net.imglib2.Interval;
+import net.imglib2.Localizable;
 import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.Sampler;
 import net.imglib2.View;
 import net.imglib2.util.IntervalIndexer;
+import net.imglib2.view.Views;
 
 import org.scijava.util.IntArray;
 
 /**
  * Randomly shuffles an image blockwise.
- * 
+ *
  * @author Curtis Rueden
  * @author Ellen T Arena
- *
  * @param <T> Type of image to be shuffled.
  */
 public class ShuffledView<T> extends AbstractInterval implements
@@ -89,7 +91,8 @@ public class ShuffledView<T> extends AbstractInterval implements
 			final long blockDim = image.dimension(d) / blockSize[d];
 			if (blockDim * blockSize[d] != image.dimension(d)) {
 				throw new IllegalArgumentException("Image dimension #" + d +
-					" is not evenly divisible by block size:" + blockSize[d]);
+					" is not evenly divisible by block size:" + blockSize[d] +
+					"; Please call a ShuffledView.cropAt method to adjust the input.");
 			}
 			if (blockDim > Integer.MAX_VALUE) {
 				throw new UnsupportedOperationException("Block dimension #" + d +
@@ -106,13 +109,13 @@ public class ShuffledView<T> extends AbstractInterval implements
 			this.blockIndices = createBlocks((int) totalBlocks);
 			rng = new Random(seed);
 			shuffleBlocks();
-		} else {
+		}
+		else {
 			this.blockIndices = blockIndices;
 		}
 	}
 
-	private static List<Integer> createBlocks(final int blockCount)
-	{
+	private static List<Integer> createBlocks(final int blockCount) {
 		// generate the identity mapping of indices
 		final IntArray blocks = new IntArray();
 		blocks.ensureCapacity(blockCount);
@@ -127,7 +130,7 @@ public class ShuffledView<T> extends AbstractInterval implements
 		}
 		Collections.shuffle(blockIndices, rng);
 	}
-	
+
 	@Override
 	public RandomAccess<T> randomAccess() {
 		return new ShuffledRandomAccess();
@@ -186,5 +189,45 @@ public class ShuffledView<T> extends AbstractInterval implements
 		public RandomAccess<T> copyRandomAccess() {
 			throw new UnsupportedOperationException();
 		}
+	}
+
+	public static <T> RandomAccessibleInterval<T> cropAtMin(
+		final RandomAccessibleInterval<T> image, final int[] blockSize)
+	{
+		return cropAt(image, blockSize, new Point(image.numDimensions()));
+	}
+
+	public static <T> RandomAccessibleInterval<T> cropAtMax(
+		final RandomAccessibleInterval<T> image, final int[] blockSize)
+	{
+		final long[] pos = new long[image.numDimensions()];
+		for (int d = 0; d < pos.length; d++) {
+			pos[d] = image.dimension(d) % blockSize[d];
+		}
+		return cropAt(image, blockSize, new Point(pos));
+	}
+
+	public static <T> RandomAccessibleInterval<T> cropAtCenter(
+		final RandomAccessibleInterval<T> image, final int[] blockSize)
+	{
+		final long[] pos = new long[image.numDimensions()];
+		for (int d = 0; d < pos.length; d++) {
+			pos[d] = (image.dimension(d) % blockSize[d]) / 2;
+		}
+		return cropAt(image, blockSize, new Point(pos));
+	}
+
+	private static <T> RandomAccessibleInterval<T> cropAt(
+		final RandomAccessibleInterval<T> image, final int[] blockSize,
+		final Localizable offset)
+	{
+		final int numDims = image.numDimensions();
+		final long[] minsize = new long[numDims * 2];
+		for (int d = 0; d < numDims; d++) {
+			minsize[d] = offset.getLongPosition(d);
+			final long shaveSize = image.dimension(d) % blockSize[d];
+			minsize[numDims + d] = image.dimension(d) - shaveSize;
+		}
+		return Views.interval(image, FinalInterval.createMinSize(minsize));
 	}
 }
