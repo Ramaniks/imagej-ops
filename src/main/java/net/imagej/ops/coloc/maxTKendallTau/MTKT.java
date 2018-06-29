@@ -213,12 +213,13 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		final IntArray rankIndex2 = rankSamples(image2, seed);
 
 		//////////////////////////////// TODO: Confirm dealing with thresholds (same as Shulei's method) <<below>>
-		List<Integer> validIndex = new ArrayList<Integer>();
+//		List<Integer> validIndex = new ArrayList<Integer>();
+		IntArray validIndex = new IntArray();
 		for (int i = 0; i < n; i++)
 		{
 			if(rankIndex1.get(i) >= thres1 && rankIndex2.get(i) >= thres2)
 			{
-				validIndex.add(i);
+				validIndex.addValue(i);
 			}
 		}
 		int rn=validIndex.size();
@@ -275,7 +276,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 		final double step = 1 + 1.0 / Math.log(Math.log(n));
 		double tempOff1 = 1;
 		double tempOff2;
-		List<Integer> activeIndex;
+		IntArray activeIndex;
 		double sdTau;
 		double kendallTau;
 		double normalTau;
@@ -287,10 +288,10 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 			while (tempOff2 * step + thresholdRank2 < n) {
 				tempOff2 *= step;
 
-				activeIndex = new ArrayList<Integer>();
+				activeIndex = new IntArray();
 				for (int i = 0; i < rn; i++) {
 					if (rank[i][0] >= n - tempOff1 && rank[i][1] >= n - tempOff2) {
-						activeIndex.add(i);
+						activeIndex.addValue(i);
 					}
 				}
 				an = activeIndex.size();
@@ -310,7 +311,7 @@ public class MTKT<T extends RealType<T>, U extends RealType<U>>
 	}
 
 	static double calculateKendallTau(final double[][] rank,
-		final List<Integer> activeIndex)
+		final IntArray activeIndex)
 	{
 		final int an = activeIndex.size();
 		final double[][] partRank = new double[2][an];
