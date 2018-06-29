@@ -142,9 +142,11 @@ public class ShuffledView<T> extends AbstractInterval implements
 	}
 
 	private class ShuffledRandomAccess extends Point implements RandomAccess<T> {
-
+		private final RandomAccess<T> imageRA;
+		
 		public ShuffledRandomAccess() {
 			super(image.numDimensions());
+			imageRA = image.randomAccess();
 		}
 
 		@Override
@@ -172,7 +174,6 @@ public class ShuffledView<T> extends AbstractInterval implements
 
 			// Finally, position the original image according to our shuffled
 			// position.
-			final RandomAccess<T> imageRA = image.randomAccess();
 			for (int d = 0; d < position.length; d++) {
 				final long pd = shuffledBlockPos[d] * blockSize[d] + blockOffset[d];
 				imageRA.setPosition(pd, d);
